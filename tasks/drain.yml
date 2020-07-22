@@ -1,0 +1,28 @@
+---
+- name: Cordon node
+  command: >-
+    {{ bin_dir }}/kubectl cordon
+    {{ kube_override_hostname|default(inventory_hostname) }}
+  delegate_to: "{{ groups['kube-master'][0] }}"
+
+- name: Wait for node to cordon
+  command: >-
+    {{ bin_dir }}/kubectl get node
+    {{ kube_override_hostname|default(inventory_hostname) }}
+    -o json
+  register: wait_for_cordon
+  retries: 10
+  delay: 10
+  delegate_to: "{{ groups['kube-master'][0] }}"
+  changed_when: false
+  until: (wait_for_cordon['stdout'] | from_json).spec.unschedulable
+
+- name: Drain node
+  command: >-
+    {{ bin_dir }}/kubectl drain
+    --force
+    --ignore-daemonsets
+    --grace-period {{ drain_grace_period }}
+    --timeout {{ drain_timeout }}
+    --delete-local-data {{ kube_override_hostname|default(inventory_hostname) }}
+  delegate_to: "{{ groups['kube-master'][0] }}"

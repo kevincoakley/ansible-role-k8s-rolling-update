@@ -1,2 +1,4 @@
 ---
-# defaults file for ansible-role-k8s-rolling-update
+bin_dir: /usr/local/bin
+drain_grace_period: 300
+drain_timeout: 360s

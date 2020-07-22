@@ -1,0 +1,16 @@
+---
+- name: Update all packages
+  apt:
+    upgrade: dist
+    update_cache: yes
+    force_apt_get: yes
+
+- name: Check if reboot is required
+  stat:
+    path: /var/run/reboot-required
+  register: reboot_required
+
+- name: Reboot the server
+  reboot:
+    post_reboot_delay: 30
+  when: reboot_required.stat.exists

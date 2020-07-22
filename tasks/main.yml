@@ -1,2 +1,26 @@
 ---
-# tasks file for ansible-role-k8s-rolling-update
+- name: Get the node's details
+  command: >-
+    {{ bin_dir }}/kubectl get node
+    {{ kube_override_hostname|default(inventory_hostname) }}
+    -o json
+  register: kubectl_get_node
+  delegate_to: "{{ groups['kube-master'][0] }}"
+  failed_when: false
+  changed_when: false
+
+- name: Update Node
+  when:
+    # When status.conditions[x].type == Ready then check stats.conditions[x].status for True|False
+    - kubectl_get_node['stdout'] | from_json | json_query("status.conditions[?type == 'Ready'].status")
+    # If spec.unschedulable is defined then the node is cordoned
+    - not (kubectl_get_node['stdout'] | from_json).spec.unschedulable is defined
+  block:
+    - name: Cordon & drain node
+      include_tasks: drain.yml
+
+    - name: Upgrade the Operating System
+      include_tasks: "{{ ansible_distribution }}.yml"
+
+    - name: Uncordon node
+      include_tasks: uncordon.yml

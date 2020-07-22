@@ -1,0 +1,11 @@
+---
+- hosts:
+    - kube-master
+    - kube-node
+  become: true
+  become_method: sudo
+  serial: 1
+  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
+
+  roles:
+    - k8s-rolling-update
