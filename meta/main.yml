@@ -1,3 +1,4 @@
+---
 galaxy_info:
   role_name: k8s-rolling-updates
   author: Kevin Coakley
