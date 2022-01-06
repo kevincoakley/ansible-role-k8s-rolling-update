@@ -4,6 +4,7 @@
     {{ bin_dir }}/kubectl cordon
     {{ kube_override_hostname|default(inventory_hostname) }}
   delegate_to: "{{ groups['kube-master'][0] }}"
+  changed_when: false
 
 - name: Wait for node to cordon
   command: >-
@@ -26,3 +27,4 @@
     --timeout {{ drain_timeout }}
     --delete-local-data {{ kube_override_hostname|default(inventory_hostname) }}
   delegate_to: "{{ groups['kube-master'][0] }}"
+  changed_when: false
