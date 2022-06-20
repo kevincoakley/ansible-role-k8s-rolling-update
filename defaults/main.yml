@@ -6,3 +6,6 @@ bin_dir: /usr/local/bin
 drain_grace_period: 300
 # The length of time to wait before giving up, zero means infinite.
 drain_timeout: 360s
+# Period of time in seconds given before draining the next node
+wait_after_uncordon_enabled: false
+wait_after_uncordon_period_seconds: 60

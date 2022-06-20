@@ -17,3 +17,9 @@
   delegate_to: "{{ groups['kube_control_plane'][0] }}"
   changed_when: false
   until: not (kubectl_get_node['stdout'] | from_json).spec.unschedulable is defined
+
+- name: Wait before uncordoning node
+  pause:
+    seconds: "{{ wait_after_uncordon_period_seconds }}"
+  when:
+  - wait_after_uncordon_enabled

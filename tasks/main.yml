@@ -20,7 +20,7 @@
       include_tasks: drain.yml
 
     - name: Upgrade the Operating System
-      include_tasks: "{{ ansible_distribution }}.yml"
+      include_tasks: "{{ ansible_distribution | lower }}.yml"
 
     - name: Uncordon node
       include_tasks: uncordon.yml
