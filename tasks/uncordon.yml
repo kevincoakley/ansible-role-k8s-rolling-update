@@ -3,7 +3,7 @@
   command: >-
     {{ bin_dir }}/kubectl uncordon
     {{ kube_override_hostname|default(inventory_hostname) }}
-  delegate_to: "{{ groups['kube-master'][0] }}"
+  delegate_to: "{{ groups['kube_control_plane'][0] }}"
   changed_when: false
 
 - name: Wait for node to uncordon
@@ -14,6 +14,12 @@
   register: wait_for_uncordon
   retries: 10
   delay: 10
-  delegate_to: "{{ groups['kube-master'][0] }}"
+  delegate_to: "{{ groups['kube_control_plane'][0] }}"
   changed_when: false
   until: not (kubectl_get_node['stdout'] | from_json).spec.unschedulable is defined
+
+- name: Wait before uncordoning node
+  pause:
+    seconds: "{{ wait_after_uncordon_period_seconds }}"
+  when:
+  - wait_after_uncordon_enabled
